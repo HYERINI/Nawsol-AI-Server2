@@ -1,4 +1,4 @@
-from typing import List, Set, Tuple
+from typing import List
 from config.database.session import get_db_session
 from sqlalchemy.orm import Session
 from sqlalchemy import and_

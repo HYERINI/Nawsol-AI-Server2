@@ -6,6 +6,7 @@ from account.adapter.input.web.account_router import account_router
 from config.database.session import Base, engine
 from documents_multi_agents.adapter.input.web.document_multi_agent_router import documents_multi_agents_router
 from ecos.adapter.input.web.ecos_data_router.ecos_data_router import ecos_data_router
+from ieinfo.adapter.input.web.ie_info_router import ie_info_router
 from kftc.adapter.input.web.kftc_router import kftc_router
 from sosial_oauth.adapter.input.web.google_oauth2_router import authentication_router
 
@@ -34,6 +35,7 @@ app.include_router(documents_multi_agents_router, prefix="/documents-multi-agent
 app.include_router(documents_multi_agents_router, prefix="/flow")  # 프론트엔드 호환용
 app.include_router(kftc_router, prefix="/kftc")
 app.include_router(ecos_data_router, prefix="/ecos")
+app.include_router(ie_info_router, prefix="/ie_info")
 # 앱 실행
 
 if __name__ == "__main__":

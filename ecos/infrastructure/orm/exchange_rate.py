@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime, Enum as SAEnum, Integer, Float
+from sqlalchemy import Column, DateTime, Enum as SAEnum, Integer, Float
 from enum import Enum as PyEnum
 from config.database.session import Base
 
