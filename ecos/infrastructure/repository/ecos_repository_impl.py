@@ -45,6 +45,21 @@ class EcosRepositoryImpl(EcosRepositoryPort):
         # 도메인 엔티티에 id 업데이트 (필요한 경우)
         return ecos
 
+    def get_exchange_rate_by_date(self, date: str) -> List[Ecos]:
+        rows = (self.db.query(ExchangeRateORM).
+                filter(func.date_format(ExchangeRateORM.erm_date, "%Y%m") == date).
+                all())
+
+        return [
+            Ecos(
+                exchange_type=row.exchange_type.name,
+                exchange_rate=row.exchange_rate,
+                erm_date=row.erm_date,
+                created_at=row.created_at
+            )
+            for row in rows
+        ]
+
     async def save_exchange_rates_batch(self, ecos_list: List[Ecos]) -> List[Ecos]:
         """
         배치로 환율 데이터를 저장한다.

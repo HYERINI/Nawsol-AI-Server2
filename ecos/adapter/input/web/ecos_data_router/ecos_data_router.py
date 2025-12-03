@@ -63,6 +63,11 @@ async def get_interest_rate():
         ]
     }
 
+@ecos_data_router.get("/exchange_rate_by_date/{date}")
+async def get_exchange_rate_db(date:str):
+    usecase = FetchEcosDataUsecaseFactory.create()
+    result = usecase.get_exchange_rate_by_date(date)
+    return result
 
 @ecos_data_router.post("/interest_rate/save")
 async def fetch_and_save_interest_rate(

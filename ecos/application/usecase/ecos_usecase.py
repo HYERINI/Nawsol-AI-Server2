@@ -19,6 +19,9 @@ class FetchEcosUseCase:
     async def get_exchange_rate(self) -> EcosData:
         return await self.adapter.get_exchange_rate()
 
+    def get_exchange_rate_by_date(self, date: str) -> List[Ecos]:
+        return self.repository.get_exchange_rate_by_date(date)
+
     async def fetch_and_save_exchange_rate(self, start:str, end:str) -> List[Ecos]:
         """
         ECOS API에서 환율 데이터를 조회하고 데이터베이스에 저장한다.

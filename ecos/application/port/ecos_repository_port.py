@@ -16,6 +16,10 @@ class EcosRepositoryPort(ABC):
         pass
 
     @abstractmethod
+    def get_exchange_rate_by_date(self, date: str) -> List[Ecos]:
+        pass
+
+    @abstractmethod
     async def save_interest_rate(self, ecos: EcosInterest) -> EcosInterest:
         pass
 
