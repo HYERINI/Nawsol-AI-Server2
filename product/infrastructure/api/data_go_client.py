@@ -3,6 +3,7 @@ from datetime import datetime
 
 import aiohttp
 
+
 class DataGoClient:
 
     def __init__(self):

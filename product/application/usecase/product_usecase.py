@@ -5,9 +5,9 @@ from product.application.port.product_repository_port import ProductRepositoryPo
 from product.domain.product_etf import ProductEtf
 from product.domain.product_etf_data import ProductEtfData
 from product.infrastructure.api.data_go_client import DataGoClient
+from product.infrastructure.orm.product_bond import ProductBondORM
 from product.infrastructure.orm.product_etf import ProductETFORM
 from product.infrastructure.orm.product_fund import ProductFundORM
-
 from util.log.log import Log
 
 logger = Log.get_logger()
@@ -53,3 +53,6 @@ class FetchProductUseCase:
 
     async def get_fund_data_by_date(self, date:str) -> List[ProductFundORM]:
         return await self.repository.get_fund_data_by_date(date)
+
+    async def get_bond_data_by_date(self, date:str) -> List[ProductBondORM]:
+        return await self.repository.get_bond_data_by_date(date)

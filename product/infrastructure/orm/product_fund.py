@@ -1,6 +1,10 @@
-from config.database.session import Base
 from datetime import datetime
+
 from sqlalchemy import Column, String, Integer, DateTime
+
+from config.database.session import Base
+
+
 class ProductFundORM(Base):
     __tablename__ = "product_fund"
     id = Column(Integer, primary_key=True, index=True)

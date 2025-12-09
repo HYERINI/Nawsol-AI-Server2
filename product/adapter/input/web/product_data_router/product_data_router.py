@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 
 from product.application.factory.fetch_product_data_usecase_factory import FetchProductDataUsecaseFactory
 
@@ -74,4 +74,10 @@ async def fetch_and_save_etf():
 async def get_fund_info(date:str):
     usecase = FetchProductDataUsecaseFactory.create()
     result = await usecase.get_fund_data_by_date(date)
+    return result
+
+@product_data_router.get("/bond/{date}")
+async def get_bond_info(date:str):
+    usecase = FetchProductDataUsecaseFactory.create()
+    result = await usecase.get_bond_data_by_date(date)
     return result

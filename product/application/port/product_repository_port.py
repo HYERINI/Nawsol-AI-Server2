@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from product.domain.product_etf import ProductEtf
+from product.infrastructure.orm.product_bond import ProductBondORM
 from product.infrastructure.orm.product_etf import ProductETFORM
 from product.infrastructure.orm.product_fund import ProductFundORM
 
@@ -18,4 +19,8 @@ class ProductRepositoryPort(ABC):
 
     @abstractmethod
     async def get_fund_data_by_date(self, date:str) -> List[ProductFundORM]:
+        pass
+
+    @abstractmethod
+    async def get_bond_data_by_date(self, date:str) -> List[ProductBondORM]:
         pass

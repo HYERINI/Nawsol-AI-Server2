@@ -1,14 +1,13 @@
 from typing import List
 
-from sqlalchemy.engine import row
-
-from product.application.port.product_repository_port import ProductRepositoryPort
-from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from config.database.session import get_db_session
+from product.application.port.product_repository_port import ProductRepositoryPort
 from product.domain.product_etf import ProductEtf
+from product.infrastructure.orm.product_bond import ProductBondORM
 from product.infrastructure.orm.product_etf import ProductETFORM
 from product.infrastructure.orm.product_fund import ProductFundORM
 
@@ -128,6 +127,37 @@ class ProductRepositoryImpl(ProductRepositoryPort):
                 fndTp = row.fndTp,
                 prdClsfCd = row.prdClsfCd,
                 asoStdCd = row.asoStdCd,
+            )
+            for row in rows
+        ]
+
+    async def get_bond_data_by_date(self, date:str) -> List[ProductBondORM]:
+        rows = (self.db.query(ProductBondORM).
+                filter(func.date_format(ProductBondORM.basDt, "%Y%m%d") == date).
+                all())
+
+        return [
+            ProductBondORM(
+                id = row.id,
+                baseDt = row.baseDt,
+                crno = row.crno,
+                bondIsurNm = row.bondIsurNm,
+                bondIssuDt = row.bondIssuDt,
+                scrsItmsKcd = row.scrsItmsKcd,
+                scrsItmsKcdNm = row.scrsItmsKcdNm,
+                isinCd = row.isinCd,
+                isinCdNm = row.isinCdNm,
+                bondIssuFrmtNm = row.bondIssuFrmtNm,
+                bondExprDt = row.bondExprDt,
+                bondIssuCurCd = row.bondIssuCurCd,
+                bondIssuCurCdNm = row.bondIssuCurCdNm,
+                bondPymtAmt = row.bondPymtAmt,
+                bondIssuAmt = row.bondIssuAmt,
+                bondSrfcInrt = row.bondSrfcInrt,
+                irtChngDcd = row.irtChngDcd,
+                irtChngDcdNm = row.irtChngDcdNm,
+                bondIntTcd = row.bondIntTcd,
+                bondIntTcdNm = row.bondIntTcdNm,
             )
             for row in rows
         ]

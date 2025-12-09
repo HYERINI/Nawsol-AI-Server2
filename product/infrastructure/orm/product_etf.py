@@ -1,6 +1,9 @@
-from config.database.session import Base
 from datetime import datetime
+
 from sqlalchemy import Column, String, BigInteger, DateTime, Integer, Float
+
+from config.database.session import Base
+
 
 class ProductETFORM(Base):
     __tablename__ = "product_etf"

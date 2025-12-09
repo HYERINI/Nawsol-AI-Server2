@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import List
 
+from ecos.domain.value_object.timestamp import Timestamp
 from product.domain.product_etf import ProductEtf
 from product.domain.product_etf_data import ProductEtfData
 from product.domain.value_object.product_source import ProductSource
 from product.infrastructure.api.data_go_client import DataGoClient
-from ecos.domain.value_object.timestamp import Timestamp
-from typing import List
+
 
 class ProductDataApiAdapter:
     def __init__(self):
