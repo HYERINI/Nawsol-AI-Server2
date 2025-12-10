@@ -154,7 +154,7 @@ class ETFRecommendationService:
             # AI 프롬프트 작성 (2부)
             prompt_part2 = """
 
-### 2. ETF 추천 (반드시 3개)
+### 2. ETF 추천
 
 **[추천 1] ETF명**
 - 추천 이유: (2-3문장)

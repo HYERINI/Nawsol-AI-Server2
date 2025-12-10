@@ -3,6 +3,7 @@ ETF 추천 UseCase
 로그인 여부에 따라 DB 또는 Redis에서 자산 정보를 가져와 ETF 추천
 """
 from typing import Dict, List
+from datetime import datetime, timedelta
 from config.crypto import Crypto
 from config.redis_config import get_redis
 from ieinfo.infrastructure.repository.ie_info_repository_impl import IEInfoRepositoryImpl
@@ -205,16 +206,38 @@ class ETFRecommendationUseCase:
                 try:
                     from product.application.factory.fetch_product_data_usecase_factory import FetchProductDataUsecaseFactory
                     fetch_usecase = FetchProductDataUsecaseFactory.create()
-                    etf_entities = await fetch_usecase.fetch_and_save_etf_data()
+                    
+                    # 현재 날짜부터 최대 7일 전까지 시도 (주말/공휴일 고려)
+                    today = datetime.now()
+                    etf_entities = None
+                    
+                    for days_ago in range(7):
+                        target_date = (today - timedelta(days=days_ago)).strftime("%Y%m%d")
+                        logger.info(f"Trying to fetch ETF data for date: {target_date}")
+                        
+                        try:
+                            # ETF 데이터 가져오기 (start, end 파라미터 전달)
+                            etf_entities = await fetch_usecase.fetch_and_save_etf_data(start=target_date, end=target_date)
+                            
+                            if etf_entities and len(etf_entities) > 0:
+                                logger.info(f"Successfully fetched {len(etf_entities)} ETF records for {target_date}")
+                                break
+                            else:
+                                logger.warning(f"No ETF data found for {target_date}, trying previous day...")
+                        except Exception as date_error:
+                            logger.warning(f"Failed to fetch ETF data for {target_date}: {str(date_error)}")
+                            continue
 
-                    if etf_entities:
+                    if etf_entities and len(etf_entities) > 0:
                         logger.info(f"Successfully auto-saved {len(etf_entities)} ETF records")
                         # 다시 DB에서 조회
                         etf_records = self.product_repository.get_all_etf()
                     else:
-                        logger.error("Failed to auto-fetch ETF data")
+                        logger.error("Failed to auto-fetch ETF data - no data found for the past 7 days")
                 except Exception as fetch_error:
                     logger.error(f"Error auto-fetching ETF data: {str(fetch_error)}")
+                    import traceback
+                    traceback.print_exc()
 
             if not etf_records:
                 return {
