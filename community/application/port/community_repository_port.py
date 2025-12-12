@@ -7,9 +7,11 @@ from community.domain.value_object.community_post import CommunityPost
 class CommunityRepositoryPort(ABC):
 
     @abstractmethod
-    def save_post_batch(self, posts: List[CommunityPost]) -> List[CommunityPost]:
-        """
-        provider + board_id + external_post_id 기준으로
-        이미 있는 건 건너뛰고, 새로운 글만 insert.
-        """
+    async def save_post_batch(self, posts: List[CommunityPost]) -> int:
+        """새로 insert 된 개수 반환"""
+        ...
+
+    @abstractmethod
+    async def find_latest_posts(self, board_id: str, page: int = 1, limit: int = 20) -> List[CommunityPost]:
+        """DB에서 최신 글 조회"""
         ...

@@ -1,7 +1,6 @@
 from typing import List
-
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 
 from config.database.session import get_db_session
 from community.application.port.community_repository_port import CommunityRepositoryPort
@@ -27,15 +26,12 @@ class CommunityRepositoryImpl(CommunityRepositoryPort):
         if not hasattr(self, "db"):
             self.db: Session = get_db_session()
 
-    def save_post_batch(self, posts: List[CommunityPost]) -> List[CommunityPost]:
-        """
-        provider + board_id + external_post_id 기준으로
-        이미 DB에 있는 글은 건너뛰고, 새로운 글만 insert
-        """
+    async def save_post_batch(self, posts: List[CommunityPost]) -> int:
         if not posts:
-            return []
+            return 0
 
-        new_list: List[CommunityPost] = []
+        saved = 0
+        orm_list: List[CommunityPostORM] = []
 
         for p in posts:
             existing = (
@@ -49,16 +45,9 @@ class CommunityRepositoryImpl(CommunityRepositoryPort):
                 )
                 .first()
             )
+            if existing:
+                continue
 
-            if not existing:
-                new_list.append(p)
-
-        # 전부 중복이면 그냥 원본 리스트 리턴
-        if not new_list:
-            return posts
-
-        orm_list: List[CommunityPostORM] = []
-        for p in new_list:
             orm_list.append(
                 CommunityPostORM(
                     provider=p.provider,
@@ -76,10 +65,41 @@ class CommunityRepositoryImpl(CommunityRepositoryPort):
                 )
             )
 
+        if not orm_list:
+            return 0
+
         self.db.add_all(orm_list)
         self.db.commit()
+        saved = len(orm_list)
 
-        for orm_item in orm_list:
-            self.db.refresh(orm_item)
+        return saved
 
-        return posts
+    async def find_latest_posts(self, board_id: str, page: int = 1, limit: int = 20) -> List[CommunityPost]:
+        offset = (page - 1) * limit
+
+        rows = (
+            self.db.query(CommunityPostORM)
+            .filter(CommunityPostORM.board_id == board_id)
+            .order_by(desc(CommunityPostORM.posted_at), desc(CommunityPostORM.id))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+
+        return [
+            CommunityPost(
+                provider=r.provider,
+                board_id=r.board_id,
+                external_post_id=r.external_post_id,
+                title=r.title,
+                author=r.author or "",
+                content=r.content or "",
+                url=r.url,
+                view_count=r.view_count,
+                recommend_count=r.recommend_count,
+                comment_count=r.comment_count or 0,
+                posted_at=r.posted_at,
+                fetched_at=r.fetched_at,
+            )
+            for r in rows
+        ]

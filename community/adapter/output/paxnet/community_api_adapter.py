@@ -84,7 +84,7 @@ class PaxnetCommunityAdapter:
 
     async def _fill_contents(self, board_id: str, posts: List[CommunityPost]):
         tasks = [
-            self.client.fetch_post_html(board_id, p.external_post_id)
+            self.client.fetch_post_html(board_id, str(p.external_post_id))
             for p in posts
         ]
 

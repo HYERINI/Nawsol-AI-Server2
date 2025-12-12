@@ -4,14 +4,15 @@ from community.application.factory.fetch_community_usecase_factory import FetchC
 
 community_router = APIRouter(tags=["community"])
 
+
 @community_router.get("/fetch")
 async def get_latest_paxnet_posts(
-    board_id: str = Query("N11022", description="Paxnet board id (N11022=시황분석실)"),
+    board_id: str = Query("N11022"),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
 ):
     usecase = FetchCommunityUsecaseFactory.create()
-    posts = await usecase.fetch_latest(board_id=board_id, page=page, limit=limit)
+    posts = await usecase.fetch_latest_from_db(board_id=board_id, page=page, limit=limit)
 
     return {
         "board_id": board_id,
@@ -42,12 +43,12 @@ async def fetch_and_save_paxnet_latest(
     limit: int = Query(50, ge=1, le=200),
 ):
     usecase = FetchCommunityUsecaseFactory.create()
-    posts = await usecase.fetch_and_save_latest(board_id=board_id, page=page, limit=limit)
+    result = await usecase.fetch_and_save_latest(board_id=board_id, page=page, limit=limit)
 
     return {
         "message": "Paxnet 게시글 크롤링 및 저장 완료",
         "board_id": board_id,
-        "saved_count": len(posts),
+        "saved_count": result["saved_count"],
         "items": [
             {
                 "provider": p.provider,
@@ -62,6 +63,6 @@ async def fetch_and_save_paxnet_latest(
                 "posted_at": p.posted_at.isoformat() if p.posted_at else None,
                 "fetched_at": p.fetched_at.isoformat(),
             }
-            for p in posts
-        ]
+            for p in result["items"]
+        ],
     }
